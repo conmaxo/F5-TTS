@@ -69,35 +69,43 @@ fix_duration = None
 
 # chunk text into smaller pieces
 
-
 def chunk_text(text, max_chars=135):
-    """
-    Splits the input text into chunks, each with a maximum number of characters.
-
-    Args:
-        text (str): The text to be split.
-        max_chars (int): The maximum number of characters per chunk.
-
-    Returns:
-        List[str]: A list of text chunks.
-    """
-    chunks = []
-    current_chunk = ""
-    # Split the text into sentences based on punctuation followed by whitespace
-    sentences = re.split(r"(?<=[;:,.!?])\s+|(?<=[；：，。！？])", text)
-
-    for sentence in sentences:
-        if len(current_chunk.encode("utf-8")) + len(sentence.encode("utf-8")) <= max_chars:
-            current_chunk += sentence + " " if sentence and len(sentence[-1].encode("utf-8")) == 1 else sentence
+    sentences = [s.strip() for s in text.split('. ') if s.strip()]
+    i = 0
+    while i < len(sentences):
+        if len(sentences[i].split()) < 4:
+            if i == 0:
+                # Merge with the next sentence
+                sentences[i + 1] = sentences[i] + ', ' + sentences[i + 1]
+                del sentences[i]
+            else:
+                # Merge with the previous sentence
+                sentences[i - 1] = sentences[i - 1] + ', ' + sentences[i]
+                del sentences[i]
+                i -= 1
         else:
-            if current_chunk:
-                chunks.append(current_chunk.strip())
-            current_chunk = sentence + " " if sentence and len(sentence[-1].encode("utf-8")) == 1 else sentence
+            i += 1
 
-    if current_chunk:
-        chunks.append(current_chunk.strip())
+    final_sentences = []
+    for sentence in sentences:
+        parts = [p.strip() for p in sentence.split(', ')]
+        buffer = []
+        for part in parts:
+            buffer.append(part)
+            total_words = sum(len(p.split()) for p in buffer)
+            if total_words > 20:
+                # Split into separate chunks
+                long_part = ', '.join(buffer)
+                final_sentences.append(long_part)
+                buffer = []
+        if buffer:
+            final_sentences.append(', '.join(buffer))
 
-    return chunks
+    if len(final_sentences[-1].split()) < 4 and len(final_sentences) >= 2:
+        final_sentences[-2] = final_sentences[-2] + ", " + final_sentences[-1]
+        final_sentences = final_sentences[0:-1]
+
+    return final_sentences
 
 
 # load vocoder
