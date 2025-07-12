@@ -15,7 +15,6 @@ def clean_text(text: str) -> str:
 
     text = (
         text.strip()
-        .replace("\n", ".")
         .replace("  ", " ")
         .replace("”", "")
         .replace("“", "")
@@ -26,10 +25,12 @@ def clean_text(text: str) -> str:
         .replace("(", "")
         .replace(")", "")
         .replace("#", "")
-        .replace("…", "")
-        .replace("!", ".")
-        .replace("?", ".")
-        .replace("..", ".")
+        .replace("…", ". ")
+        .replace("!", "\n")
+        .replace("?", "\n")
+        .replace("\n", ".")
+        .replace("..", ". ")
+        .replace("...", ", ")
     )
 
     text = re.sub(pattern, "", text)
@@ -37,7 +38,7 @@ def clean_text(text: str) -> str:
     return cleaner.clean().strip()
 
 if __name__ == "__main__":
-    sample_text = "Chu Thanh đáp: “Bế quan tại đây, sơ bộ học tập thuật kết giới.”"
+    sample_text = "“Đầu Tư Thiên Mệnh Tộc Nhân, Thực Lực Của Ta Là Toàn Tộc Cộng Lại.\nVừa mở mắt, Khương Đạo Huyền đã ở trong thân xác tộc trưởng Khương gia. Đáng buồn thay, vì đột phá thất bại do đan dược bị hạ độc"
     cleaned_text = clean_text(sample_text)
     print("Original Text:", sample_text)
     print("Cleaned Text:", cleaned_text)
