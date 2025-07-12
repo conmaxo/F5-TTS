@@ -26,6 +26,10 @@ def clean_text(text: str) -> str:
         .replace("(", "")
         .replace(")", "")
         .replace("#", "")
+        .replace("…", "")
+        .replace("!", ".")
+        .replace("?", ".")
+        .replace("..", ".")
     )
 
     text = re.sub(pattern, "", text)
